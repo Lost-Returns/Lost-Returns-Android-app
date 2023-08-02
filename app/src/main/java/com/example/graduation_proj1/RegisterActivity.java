@@ -8,6 +8,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -21,7 +22,7 @@ import com.google.firebase.firestore.auth.User;
 
 import com.example.graduation_proj1.models.Users;
 
-public class RegisterActivity extends MainActivity {
+public class RegisterActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     private EditText editTextEmail, editTextPassword, editTextConfirmPassword, editTextName, editTextContact;
@@ -73,7 +74,7 @@ public class RegisterActivity extends MainActivity {
                             // 예를 들어, Firestore 등을 사용하여 데이터베이스에 저장할 수 있습니다.
                             if (user != null) {
                                 // 사용자가 로그인한 경우, 추가 정보를 Firestore에 저장합니다.
-                                saveAdditionalUserInfo(user.getUid(), name, contact);
+                                saveAdditionalUserInfo(user.getUid(), email, name, contact);
                             }
 
                             // 이 예제에서는 간단하게 Toast 메시지로 확인해봅니다.
@@ -87,11 +88,11 @@ public class RegisterActivity extends MainActivity {
                 });
     }
 
-    private void saveAdditionalUserInfo(String userId, String name, String contact) {
+    private void saveAdditionalUserInfo( String userId, String email, String name, String contact) {
         // Firestore에 추가 정보를 저장하는 코드를 작성합니다.
         // 예시로 users 컬렉션을 생성하고 해당 사용자의 문서에 추가 정보를 저장합니다.
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        Users user = new Users(name, contact);
+        Users user = new Users(email, name, contact);
         final String TAG = "RegisterActivity";
 
         db.collection("users").document(userId)
