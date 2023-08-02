@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "508726089925",
+    "project_id": "lost-returns-android-app",
+    "storage_bucket": "lost-returns-android-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:508726089925:android:2b2c44365d270b826a78ac",
+        "android_client_info": {
+          "package_name": "com.example.graduation_proj1"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "508726089925-2q6lvab2km9a55eesvhlh8f35d8us28j.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.graduation_proj1",
+            "certificate_hash": "774433830b9861e1e5b406acf866932c41b05bc5"
+          }
+        },
+        {
+          "client_id": "508726089925-evgbso07vleum1krrgs3gi26nddho56u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD3N_bcO_h8fCr4eH32XP2eLVNytqBoUsQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "508726089925-evgbso07vleum1krrgs3gi26nddho56u.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
