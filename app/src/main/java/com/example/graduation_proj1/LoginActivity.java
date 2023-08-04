@@ -40,10 +40,10 @@ public class LoginActivity extends MainActivity {
         Button login_button = (Button) findViewById(R.id.button4);
         login_button.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v {
+            public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), ItemlistActivity.class);
                 startActivity(intent);
-            })
+            }
         });
 
     }
