@@ -24,7 +24,7 @@
         android:id="@+id/FindPasswordView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="1dp"
         android:layout_marginBottom="350dp"
         android:onClick="onFindPasswordViewClicked"
         android:text="비밀번호 찾기"
@@ -130,6 +130,20 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button4" />
+
+    <ImageView
+        android:id="@+id/showpassword"
+        android:layout_width="27dp"
+        android:layout_height="26dp"
+        android:layout_marginStart="9dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="26dp"
+        app:layout_constraintBottom_toTopOf="@+id/FindPasswordView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.864"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editTextTextEmailAddress2"
+        app:srcCompat="@drawable/eye" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
