@@ -30,6 +30,9 @@
         <activity
             android:name=".FindPasswordActivity">
         </activity>
+        <activity
+            android:name=".MainMenuActivity">
+        </activity>
     </application>
 
 </manifest>
