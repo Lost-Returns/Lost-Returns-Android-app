@@ -39,6 +39,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -59,7 +60,7 @@ public class MainMenuRegistFragment extends Fragment {
 
     private static final int REQUEST_CAMERA = 1;
     private static final int REQUEST_GALLERY = 2;
-    private Uri selectedImageUri; // 이미지 URI를 저장할 변수
+    private Uri selectedImageUri = null; // 이미지 URI를 저장할 변수
 
     public static MainMenuRegistFragment newInstance(){
         return new MainMenuRegistFragment();
@@ -208,15 +209,22 @@ public class MainMenuRegistFragment extends Fragment {
             }
         } else if (requestCode == REQUEST_CAMERA) {
             if (data != null) {
-                //이미지 uri 저장 - 나중에 저장 시 필요
-                selectedImageUri = data.getData();
-
                 // 카메라로 찍은 이미지의 비트맵 가져오기
                 Bitmap bitmap = (Bitmap) data.getExtras().get("data");
                 //이미지뷰에 비트맵 설정하여 표시
                 imageView.setImageBitmap(bitmap);
+
+                //이미지 uri 저장 - 나중에 저장 시 필요
+                selectedImageUri = getImageUri(getContext(), bitmap);
             }
         }
+    }
+    // Bitmap을 Uri로 변환하는 메서드
+    private Uri getImageUri(Context context, Bitmap bitmap) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(context.getContentResolver(), bitmap, "Title", null);
+        return Uri.parse(path);
     }
 
     //" 이미지를 제외한 나머지 정보 입력하기 구현"
