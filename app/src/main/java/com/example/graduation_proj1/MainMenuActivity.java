@@ -8,9 +8,11 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.example.graduation_proj1.databinding.ActivityMainBinding;
+//import com.example.graduation_proj1.databinding.ActivityMainBinding;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 
 public class MainMenuActivity extends AppCompatActivity {
@@ -59,11 +61,19 @@ public class MainMenuActivity extends AppCompatActivity {
 
     private boolean isUserLoggedIn(){
         //로그인 상태를 체크하는 로직 구현
+        // FirebaseAuth 인스턴스 가져오기
+        FirebaseAuth auth = FirebaseAuth.getInstance();
 
+        // 현재 로그인한 사용자 정보 가져오기
+        FirebaseUser user = auth.getCurrentUser();
+
+        // 사용자 정보가 null이 아니면 로그인 상태로 간주
+        return user != null;
 
         // 로그인 성공시
-        return true;
+        //return true;
         // 로그인 살패 시
         //return false;
+
     }
 }

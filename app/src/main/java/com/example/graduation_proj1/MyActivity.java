@@ -8,6 +8,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -53,9 +54,28 @@ public class MyActivity extends LoginActivity {
         edit_profile_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), MyProfileActivity.class);
-                startActivity(intent);
+                // 로그인 체크
+                if (isUserLoggedIn()) {
+                    Intent intent = new Intent(getApplicationContext(), MainMenuActivity.class);
+                    startActivity(intent);
+                } else {
+                    // 로그인되어 있지 않을 경우 로그인 화면으로 이동
+                    Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                    startActivity(intent);
+                }
             }
         });
     }
+    private boolean isUserLoggedIn() {
+        // FirebaseAuth 인스턴스 가져오기
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+
+        // 현재 로그인한 사용자 정보 가져오기
+        FirebaseUser user = auth.getCurrentUser();
+
+        // 사용자 정보가 null이 아니면 로그인 상태로 간주
+        return user != null;
+    }
 }
+
+
