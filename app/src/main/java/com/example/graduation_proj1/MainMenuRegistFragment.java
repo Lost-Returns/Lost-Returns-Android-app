@@ -227,7 +227,7 @@ public class MainMenuRegistFragment extends Fragment {
         return Uri.parse(path);
     }
 
-    //" 이미지를 제외한 나머지 정보 입력하기 구현"
+    //" 이미지를 제외한 나머지 정보 입력하기 구현(심화)"
 
     // 1. 물건 종류 수동 선택
 
