@@ -31,8 +31,8 @@ public class LoginActivity extends MainActivity {
         register_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), RegisterActivity.class);
-                startActivity(intent);
+                //Intent intent = new Intent(getApplicationContext(), RegisterActivity.class);
+                //startActivity(intent);
             }
         });
 
@@ -41,7 +41,10 @@ public class LoginActivity extends MainActivity {
         login_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), MyActivity.class);
+                //로그인 체크
+
+                //
+                Intent intent = new Intent(getApplicationContext(), MainMenuActivity.class);
                 startActivity(intent);
             }
         });

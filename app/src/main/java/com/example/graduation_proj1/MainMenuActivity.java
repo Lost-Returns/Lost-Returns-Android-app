@@ -26,9 +26,7 @@ public class MainMenuActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_menu);
-        //binding = ActivityMainBinding.inflate(getLayoutInflater());
 
-        //(binding.getRoot());
         if(isUserLoggedIn()) {
 
             replaceFragment(new MainMenuHomeFragment()); // 기본으로 HomeFragment 화면 표시
@@ -62,6 +60,10 @@ public class MainMenuActivity extends AppCompatActivity {
     private boolean isUserLoggedIn(){
         //로그인 상태를 체크하는 로직 구현
 
-        return false;
+
+        // 로그인 성공시
+        return true;
+        // 로그인 살패 시
+        //return false;
     }
 }
