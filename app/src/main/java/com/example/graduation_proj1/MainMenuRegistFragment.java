@@ -30,6 +30,8 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -59,6 +61,9 @@ public class MainMenuRegistFragment extends Fragment {
     private static final int REQUEST_GALLERY = 2;
     private Uri selectedImageUri; // 이미지 URI를 저장할 변수
 
+    public static MainMenuRegistFragment newInstance(){
+        return new MainMenuRegistFragment();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -269,6 +274,8 @@ public class MainMenuRegistFragment extends Fragment {
                                             public void onSuccess(DocumentReference documentReference) {
                                                 // 데이터 저장 성공 시 처리
                                                 Toast.makeText(getActivity(), "데이터 저장 성공!", Toast.LENGTH_SHORT).show();
+                                                // Fragment 전환
+                                                ((MainMenuActivity)getActivity()).replaceFragment(MainMenuHomeFragment.newInstance());
                                             }
                                         })
                                         .addOnFailureListener(new OnFailureListener() {
@@ -293,6 +300,7 @@ public class MainMenuRegistFragment extends Fragment {
         else{ //user 정보가 없을 때 (확인용)
             Toast.makeText(getActivity(), "user 정보가 없습니다.", Toast.LENGTH_SHORT).show();
         }
+
     }
 
 }
