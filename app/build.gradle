@@ -65,5 +65,5 @@ dependencies {
     // firestore
     implementation 'com.google.firebase:firebase-firestore'
 
-    //implementation 'com.android.support:design'
+    //implementation "androidx.fragment:fragment:1.6.1"
 }
