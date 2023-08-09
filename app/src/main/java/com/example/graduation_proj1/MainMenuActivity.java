@@ -1,6 +1,7 @@
 package com.example.graduation_proj1;
 
 import android.content.ClipData;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -43,6 +44,8 @@ public class MainMenuActivity extends AppCompatActivity {
                     replaceFragment(new MainMenuRegistFragment());
                 } else if (id == MENU_MY) {
                     replaceFragment(new MainMenuMyFragment());
+                    //Intent myIntent = new Intent(MainMenuActivity.this, MyActivity.class);
+                    //startActivity(myIntent);
                 }
 
                 return true;
@@ -51,29 +54,18 @@ public class MainMenuActivity extends AppCompatActivity {
         }
     }
 
-    private void replaceFragment(Fragment fragment){
+    public void replaceFragment(Fragment fragment){
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.frame_layout, fragment);
+        fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }
 
     private boolean isUserLoggedIn(){
-        //로그인 상태를 체크하는 로직 구현
-        // FirebaseAuth 인스턴스 가져오기
-        FirebaseAuth auth = FirebaseAuth.getInstance();
-
-        // 현재 로그인한 사용자 정보 가져오기
-        FirebaseUser user = auth.getCurrentUser();
-
-        // 사용자 정보가 null이 아니면 로그인 상태로 간주
-        return user != null;
-
         // 로그인 성공시
-        //return true;
-        // 로그인 살패 시
-        //return false;
+        return true;
 
     }
 }
