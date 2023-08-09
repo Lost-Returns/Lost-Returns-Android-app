@@ -38,16 +38,13 @@ public class MyProfileFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_my_profile, container, false);
 
-        reviseButton = rootView.findViewById(R.id.button7);
-        reviseButton.setOnClickListener(new View.OnClickListener() {
+        Button MainMenuMyFragment_btn = rootView.findViewById(R.id.button7);
+        MainMenuMyFragment_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // MainMenuActivity로 이동하고 MainMenuMyFragment를 표시하기 위한 인텐트 생성
-                Intent intent = new Intent(requireContext(), MainMenuActivity.class);
-                intent.putExtra("selectedFragment", "MainMenuMyFragment"); // 이 정보를 통해 프래그먼트를 선택하도록 처리할 수 있어야 합니다.
-                startActivity(intent);
+                // 새로운 Fragment로 이동
+                ((MainMenuActivity)getActivity()).replaceFragment(MainMenuMyFragment.newInstance());
             }
-
         });
 
         userEmailTextView = rootView.findViewById(R.id.userEmailTextView);
