@@ -1,6 +1,5 @@
 package com.example.graduation_proj1;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -25,7 +24,7 @@ public class MyActivity extends LoginActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my);
 
-        usernameTextView = findViewById(R.id.usernameTextView);
+        usernameTextView = findViewById(R.id.userNameTextView);
 
         // 사용자 이름 불러와 TextView에 표시
         FirebaseAuth auth = FirebaseAuth.getInstance();

@@ -1,10 +1,11 @@
 package com.example.graduation_proj1;
 
 import android.os.Bundle;
-import android.util.Log;
+import android.text.InputType;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -18,7 +19,6 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.auth.User;
 
 import com.example.graduation_proj1.models.Users;
 
@@ -35,7 +35,7 @@ public class RegisterActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
 
         editTextEmail = findViewById(R.id.editTextEmail);
-        editTextPassword = findViewById(R.id.editTextPassword);
+        editTextPassword = findViewById(R.id.confirmPasswordEditText);
         editTextConfirmPassword = findViewById(R.id.editTextConfirmPassword);
         editTextName = findViewById(R.id.editTextName);
         editTextContact = findViewById(R.id.editTextContact);
@@ -57,8 +57,52 @@ public class RegisterActivity extends AppCompatActivity {
                 } else {
                     signUpWithEmailPassword(email, password, name, contact);
                 }
+
+            }
+
+        });
+        // LoginActivity 클래스의 onCreate 메서드 내부에 추가
+        ImageView showPasswordButton = findViewById(R.id.showpassword); // 눈동자 버튼
+        EditText passwordView = findViewById(R.id.confirmPasswordEditText); // 비밀번호 입력 필드
+
+        showPasswordButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (passwordView.getInputType() == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD)) {
+                    // 비밀번호 보이게 설정
+                    passwordView.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+                    showPasswordButton.setImageResource(R.drawable.ic_eye_off);
+                } else {
+                    // 비밀번호 감추게 설정
+                    passwordView.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                    showPasswordButton.setImageResource(R.drawable.ic_eye);
+                }
+                // 커서 위치 복원
+                passwordView.setSelection(passwordView.getText().length());
             }
         });
+
+        // LoginActivity 클래스의 onCreate 메서드 내부에 추가
+        ImageView showPasswordButton2 = findViewById(R.id.showpassword2); // 눈동자 버튼
+        EditText passwordView2 = findViewById(R.id.editTextConfirmPassword); // 비밀번호 입력 필드
+
+        showPasswordButton2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (passwordView2.getInputType() == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD)) {
+                    // 비밀번호 보이게 설정
+                    passwordView2.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+                    showPasswordButton2.setImageResource(R.drawable.ic_eye_off);
+                } else {
+                    // 비밀번호 감추게 설정
+                    passwordView2.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                    showPasswordButton2.setImageResource(R.drawable.ic_eye);
+                }
+                // 커서 위치 복원
+                passwordView2.setSelection(passwordView2.getText().length());
+            }
+        });
+
     }
 
     private void signUpWithEmailPassword(final String email, final String password, final String name, final String contact) {

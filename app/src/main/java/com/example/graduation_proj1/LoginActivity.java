@@ -6,9 +6,12 @@ import static android.content.ContentValues.TAG;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -121,6 +124,27 @@ public class LoginActivity extends MainActivity {
 
             }
         });
+        // LoginActivity 클래스의 onCreate 메서드 내부에 추가
+        ImageView showPasswordButton = findViewById(R.id.showpassword); // 눈동자 버튼
+        EditText passwordView2 = findViewById(R.id.editTextTextPassword); // 비밀번호 입력 필드
+
+        showPasswordButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (passwordView2.getInputType() == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD)) {
+                    // 비밀번호 보이게 설정
+                    passwordView2.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+                    showPasswordButton.setImageResource(R.drawable.ic_eye_off);
+                } else {
+                    // 비밀번호 감추게 설정
+                    passwordView2.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                    showPasswordButton.setImageResource(R.drawable.ic_eye);
+                }
+                // 커서 위치 복원
+                passwordView2.setSelection(passwordView2.getText().length());
+            }
+        });
+
 
     }
 
