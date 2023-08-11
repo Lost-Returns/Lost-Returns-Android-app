@@ -1,15 +1,15 @@
 package com.example.graduation_proj1;
 
-import static android.app.Activity.RESULT_OK;
-
-import android.app.Activity;
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
@@ -21,35 +21,38 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContract;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import android.Manifest;
-
+//import com.google.common.net.MediaType;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+
 
 public class MainMenuRegistFragment extends Fragment {
 
@@ -61,6 +64,7 @@ public class MainMenuRegistFragment extends Fragment {
     private static final int REQUEST_CAMERA = 1;
     private static final int REQUEST_GALLERY = 2;
     private Uri selectedImageUri = null; // 이미지 URI를 저장할 변수
+    private String prediction = "기타"; // 예측값 저장할 변수
 
     public static MainMenuRegistFragment newInstance(){
         return new MainMenuRegistFragment();
@@ -85,7 +89,11 @@ public class MainMenuRegistFragment extends Fragment {
 
         btn_picture.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
+                // imageView에 사진 나오도록
                 showPictureDialog();
+
+                // 모델 서버에 이미지 전송 & 예측값 받아오기 & 예측값을 TextView(itemTypeEditText)에 업데이트
+                //processImageAndSendToServer(selectedImageUri);
             }
         });
 
@@ -203,6 +211,9 @@ public class MainMenuRegistFragment extends Fragment {
                     Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), selectedImageUri);
                     //이미지뷰에 비트맵 설정하여 표시
                     imageView.setImageBitmap(bitmap);
+
+                    // 모델 서버에 이미지 전송 & 예측값 받아오기 & 예측값을 TextView(itemTypeEditText)에 업데이트
+                    processImageAndSendToServer(selectedImageUri);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -216,8 +227,13 @@ public class MainMenuRegistFragment extends Fragment {
 
                 //이미지 uri 저장 - 나중에 저장 시 필요
                 selectedImageUri = getImageUri(getContext(), bitmap);
+
+                // 모델 서버에 이미지 전송 & 예측값 받아오기 & 예측값을 TextView(itemTypeEditText)에 업데이트
+                processImageAndSendToServer(selectedImageUri);
             }
         }
+
+
     }
     // Bitmap을 Uri로 변환하는 메서드
     private Uri getImageUri(Context context, Bitmap bitmap) {
@@ -241,6 +257,88 @@ public class MainMenuRegistFragment extends Fragment {
     // "DB에 물건 정보 저장하기"
 
     // 1. 이미지 모델 서버에 전송 => 카테고리 값 받아와서 카테고리 자동 추가
+    // 이미지를 224x224x3 크기로 변형하는 함수
+    private Bitmap resizeImage(Uri imageUri) {
+        try {
+            InputStream inputStream = requireActivity().getContentResolver().openInputStream(imageUri);
+            Bitmap originalBitmap = BitmapFactory.decodeStream(inputStream);
+
+            // 224x224 크기로 이미지 변형
+            Bitmap resizedBitmap = Bitmap.createScaledBitmap(originalBitmap, 224, 224, true);
+
+            return resizedBitmap;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public void updateTextView(String prediction) {
+        TextView textView = getView().findViewById(R.id.itemTypeEditText); // 적절한 textView ID 사용
+        textView.setText(prediction);
+    }
+
+
+    // 모델 서버에 이미지를 전송하고 예측값을 받아오는 함수
+    private void sendImageToModelServer(Bitmap imageBitmap) {
+        try {
+            OkHttpClient client = new OkHttpClient();
+            MediaType mediaType = MediaType.parse("application/octet-stream");
+
+            // Bitmap을 바이트 배열로 변환
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+            byte[] byteArray = stream.toByteArray();
+
+            // 요청 생성
+            RequestBody requestBody = RequestBody.create(mediaType, byteArray);
+            Request request = new Request.Builder()
+                    .url("https://asia-northeast3-lost-returns-android-app.cloudfunctions.net/model-serve-function") //https://asia-northeast3-lost-returns-android-app.cloudfunctions.net/model-serve-function
+                    .post(requestBody)
+                    .build();
+
+            // 요청 보내기
+            Response response = client.newCall(request).execute();
+
+            if (response.isSuccessful()) {
+                String prediction = response.body().string();
+                updateTextView(prediction);
+            } else {
+                // 예측값을 가져오는데 실패한 경우 처리
+                Toast.makeText(getActivity(), "모델의 예측값을 가져오지 못했습니다.", Toast.LENGTH_SHORT).show();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // 이미지를 변형하고 서버에 전송하여 예측값을 받아오는 작업 수행
+    private void processImageAndSendToServer(Uri imageUri) {
+        Bitmap resizedImage = resizeImage(imageUri);
+
+        if (resizedImage != null) {
+            sendImageToModelServer(resizedImage);
+        } else {
+            // 이미지 변형에 실패한 경우 처리
+            updateTextView("이미지 변형에 실패했습니다.");
+
+        }
+
+        /*Bitmap originalBitmap;
+        try {
+            InputStream inputStream = requireActivity().getContentResolver().openInputStream(imageUri);
+            originalBitmap = BitmapFactory.decodeStream(inputStream);
+        } catch (Exception e) {
+            e.printStackTrace();
+            originalBitmap=null;
+        }
+
+        sendImageToModelServer(originalBitmap);*/
+    }
+
+
+
+
 
     // 2. (이미지, 제목, 물건 종류, 분실자명, 보관 장소, 연락처, 습득 일자, 습득 장소) DB에 저장
     private void saveDataToFirestoreWithImage(Uri imageUri, String title, String itemType, String owner, String location, String contact, String foundDate, String foundLocation) {
