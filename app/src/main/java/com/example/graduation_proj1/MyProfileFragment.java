@@ -90,7 +90,7 @@ public class MyProfileFragment extends Fragment {
 
         // 비밀번호 수정
         EditText newPasswordEditText = rootView.findViewById(R.id.confirmPasswordEditText);
-        EditText confirmPasswordEditText = rootView.findViewById(R.id.confirmPasswordEditText);
+        EditText confirmPasswordEditText = rootView.findViewById(R.id.editTextConfirmPassword);
         Button changePasswordButton = rootView.findViewById(R.id.button7);
 
         changePasswordButton.setOnClickListener(new View.OnClickListener() {
