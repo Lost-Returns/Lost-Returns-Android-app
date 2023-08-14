@@ -1,18 +1,15 @@
 package com.example.graduation_proj1;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Button;
-
+import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-
-import com.example.graduation_proj1.MainMenuActivity;
-import com.example.graduation_proj1.MyProfileFragment;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -84,6 +81,22 @@ public class MainMenuMyFragment extends Fragment {
             }
         });
 
+        // 로그아웃 버튼 클릭 시 로그아웃 처리 및 메인 화면으로 이동
+        Button logoutButton = rootView.findViewById(R.id.logoutButton);
+        logoutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FirebaseAuth.getInstance().signOut();
+                navigateToMainActivity();
+            }
+        });
+
         return rootView;
+    }
+
+    private void navigateToMainActivity() {
+        Intent intent = new Intent(getActivity(), MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // 기존 엑티비티 스택을 모두 비웁니다.
+        startActivity(intent);
     }
 }
