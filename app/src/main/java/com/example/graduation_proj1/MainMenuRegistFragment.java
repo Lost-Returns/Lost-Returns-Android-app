@@ -11,7 +11,10 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
@@ -39,6 +43,7 @@ import com.google.firebase.storage.UploadTask;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,8 +52,13 @@ import android.graphics.BitmapFactory;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
+import okhttp3.Protocol;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
@@ -65,6 +75,10 @@ public class MainMenuRegistFragment extends Fragment {
     private static final int REQUEST_GALLERY = 2;
     private Uri selectedImageUri = null; // 이미지 URI를 저장할 변수
     private String prediction = "기타"; // 예측값 저장할 변수
+    private final OkHttpClient client = new OkHttpClient.Builder()
+            .protocols(Arrays.asList(Protocol.HTTP_1_1, Protocol.HTTP_2))
+            .build();
+    private Handler handler;
 
     public static MainMenuRegistFragment newInstance(){
         return new MainMenuRegistFragment();
@@ -87,13 +101,16 @@ public class MainMenuRegistFragment extends Fragment {
         foundLocationEditText = rootView.findViewById(R.id.foundLocationEditText);
         registerButton = rootView.findViewById(R.id.registerButton);
 
+        handler = new Handler(Looper.getMainLooper());
+
+
         btn_picture.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
                 // imageView에 사진 나오도록
                 showPictureDialog();
 
                 // 모델 서버에 이미지 전송 & 예측값 받아오기 & 예측값을 TextView(itemTypeEditText)에 업데이트
-                //processImageAndSendToServer(selectedImageUri);
+                //sendImageToModelServer();
             }
         });
 
@@ -116,6 +133,7 @@ public class MainMenuRegistFragment extends Fragment {
 
         return rootView;
     }
+
 
     private void showPictureDialog() {
         AlertDialog.Builder pictureDialog = new AlertDialog.Builder(getContext());
@@ -213,7 +231,7 @@ public class MainMenuRegistFragment extends Fragment {
                     imageView.setImageBitmap(bitmap);
 
                     // 모델 서버에 이미지 전송 & 예측값 받아오기 & 예측값을 TextView(itemTypeEditText)에 업데이트
-                    processImageAndSendToServer(selectedImageUri);
+                    sendImageToModelServer();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -229,7 +247,7 @@ public class MainMenuRegistFragment extends Fragment {
                 selectedImageUri = getImageUri(getContext(), bitmap);
 
                 // 모델 서버에 이미지 전송 & 예측값 받아오기 & 예측값을 TextView(itemTypeEditText)에 업데이트
-                processImageAndSendToServer(selectedImageUri);
+                sendImageToModelServer();
             }
         }
 
@@ -280,61 +298,63 @@ public class MainMenuRegistFragment extends Fragment {
 
 
     // 모델 서버에 이미지를 전송하고 예측값을 받아오는 함수
-    private void sendImageToModelServer(Bitmap imageBitmap) {
-        try {
-            OkHttpClient client = new OkHttpClient();
-            MediaType mediaType = MediaType.parse("application/octet-stream");
+    private void sendImageToModelServer() {
+        // 이미지뷰에서 이미지 추출
+        imageView.setDrawingCacheEnabled(true);
+        imageView.buildDrawingCache();
+        Bitmap imageBitmap = imageView.getDrawingCache();
 
-            // Bitmap을 바이트 배열로 변환
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-            byte[] byteArray = stream.toByteArray();
+        // 비트맵을 바이트 배열로 변환
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+        byte[] imageBytes = outputStream.toByteArray();
 
-            // 요청 생성
-            RequestBody requestBody = RequestBody.create(mediaType, byteArray);
-            Request request = new Request.Builder()
-                    .url("https://asia-northeast3-lost-returns-android-app.cloudfunctions.net/model-serve-function") //https://asia-northeast3-lost-returns-android-app.cloudfunctions.net/model-serve-function
-                    .post(requestBody)
-                    .build();
+        // HTTP POST 요청 보내기
+        RequestBody requestBody = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("image", "image.jpg", RequestBody.create(MediaType.parse("image/jpeg"), imageBytes))
+                .build();
 
-            // 요청 보내기
-            Response response = client.newCall(request).execute();
+        Request request = new Request.Builder()
+                .url("http://172.20.10.152:5000/predict")
+                .post(requestBody)
+                .build();
 
-            if (response.isSuccessful()) {
-                String prediction = response.body().string();
-                updateTextView(prediction);
-            } else {
-                // 예측값을 가져오는데 실패한 경우 처리
-                Toast.makeText(getActivity(), "모델의 예측값을 가져오지 못했습니다.", Toast.LENGTH_SHORT).show();
+        client.newCall(request).enqueue(new okhttp3.Callback() {
+            @Override
+            public void onFailure(okhttp3.Call call, IOException e) {
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+            @Override
+            public void onResponse(okhttp3.Call call, Response response) throws IOException {
+                String responseBody = response.body().string();
+                processResponse(responseBody);
+
+            }
+        });
+    }
+    private void processResponse(String responseBody){
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                String prediction;
+                try {
+                    JSONObject jsonObject = new JSONObject(responseBody);
+                    if (jsonObject.has("prediction")) {
+                        prediction = jsonObject.getString("prediction");
+                    } else {
+                        prediction = "값 없음";
+                    }
+                    Log.d("JSON", jsonObject.toString(4)); // 들여쓰기를 4칸으로 설정해서 예쁘게 출력
+                    itemTypeEditText.setText("Category: " + prediction);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
-    // 이미지를 변형하고 서버에 전송하여 예측값을 받아오는 작업 수행
-    private void processImageAndSendToServer(Uri imageUri) {
-        Bitmap resizedImage = resizeImage(imageUri);
-
-        if (resizedImage != null) {
-            sendImageToModelServer(resizedImage);
-        } else {
-            // 이미지 변형에 실패한 경우 처리
-            updateTextView("이미지 변형에 실패했습니다.");
-
-        }
-
-        /*Bitmap originalBitmap;
-        try {
-            InputStream inputStream = requireActivity().getContentResolver().openInputStream(imageUri);
-            originalBitmap = BitmapFactory.decodeStream(inputStream);
-        } catch (Exception e) {
-            e.printStackTrace();
-            originalBitmap=null;
-        }
-
-        sendImageToModelServer(originalBitmap);*/
-    }
 
 
 
