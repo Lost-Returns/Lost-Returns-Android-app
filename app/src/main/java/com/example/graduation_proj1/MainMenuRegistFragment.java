@@ -108,9 +108,6 @@ public class MainMenuRegistFragment extends Fragment {
             public void onClick(View v) {
                 // imageView에 사진 나오도록
                 showPictureDialog();
-
-                // 모델 서버에 이미지 전송 & 예측값 받아오기 & 예측값을 TextView(itemTypeEditText)에 업데이트
-                //sendImageToModelServer();
             }
         });
 
