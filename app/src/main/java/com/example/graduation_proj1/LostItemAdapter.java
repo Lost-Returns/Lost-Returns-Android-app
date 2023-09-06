@@ -1,6 +1,7 @@
 package com.example.graduation_proj1;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.graduation_proj1.models.RecyclerViewItem;
@@ -19,10 +21,24 @@ public class LostItemAdapter extends RecyclerView.Adapter<LostItemAdapter.ViewHo
     private List<RecyclerViewItem> mItemList=null;
     private Context mContext; // Context 추가
 
+    private OnItemClickListener listener;
+
     public LostItemAdapter(Context context, List<RecyclerViewItem> itemList) {
         mItemList = itemList;
         mContext = context; // Context 설정
     }
+
+
+    public interface OnItemClickListener {
+        void onItemClick(RecyclerViewItem item);
+    }
+
+    public LostItemAdapter(Context context, List<RecyclerViewItem> itemList, OnItemClickListener listener) {
+        mItemList = itemList;
+        mContext = context; // Context 설정
+        this.listener = listener;
+    }
+
 
     // onCreateViewHolder, onBindViewHolder, getItemCount 메서드 추가
 
@@ -53,6 +69,12 @@ public class LostItemAdapter extends RecyclerView.Adapter<LostItemAdapter.ViewHo
                     .load(imageUrl)
                     .into(holder.imageView);
         }
+
+        // 아이템을 클릭했을 때 리스너 호출
+        holder.itemView.setOnClickListener(view -> {
+            // 새로운 Fragment로 이동
+            ((MainMenuActivity)mContext).replaceFragment(ItemDetailFragment.newInstance(item));
+        });
     }
 
     @Override
