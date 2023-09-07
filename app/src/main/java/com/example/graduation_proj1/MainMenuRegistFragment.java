@@ -108,9 +108,6 @@ public class MainMenuRegistFragment extends Fragment {
             public void onClick(View v) {
                 // imageView에 사진 나오도록
                 showPictureDialog();
-
-                // 모델 서버에 이미지 전송 & 예측값 받아오기 & 예측값을 TextView(itemTypeEditText)에 업데이트
-                //sendImageToModelServer();
             }
         });
 
@@ -316,7 +313,7 @@ public class MainMenuRegistFragment extends Fragment {
                 .build();
 
         Request request = new Request.Builder()
-                .url("http://172.20.10.152:5000/predict")
+                .url("http://192.168.9.162:5000/predict")
                 .post(requestBody)
                 .build();
 
