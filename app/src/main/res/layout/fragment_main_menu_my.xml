@@ -71,15 +71,10 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline2" />
 
-    <!-- RecyclerView를 추가합니다. -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/activitiesRecyclerView"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@+id/textView24"
-        app:layout_constraintBottom_toTopOf="@+id/noActivitiesTextView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
     <TextView
         android:id="@+id/activityNameTextView"
@@ -91,16 +86,16 @@
 
 
     <!-- 활동 내역이 없을 때 표시할 메시지 -->
+    <!-- 기본적으로 숨겨둠 -->
+
     <TextView
-        android:id="@+id/noActivitiesTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:id="@+id/noActivityTextView"
+        android:layout_width="194dp"
+        android:layout_height="268dp"
+        android:layout_centerInParent="true"
         android:text="활동 내역이 없습니다."
-        android:textSize="16sp"
-        app:layout_constraintTop_toBottomOf="@+id/activitiesRecyclerView"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        tools:layout_editor_absoluteX="138dp"
+        tools:layout_editor_absoluteY="372dp" />
 
     <View
         android:id="@+id/view2"
