@@ -52,6 +52,7 @@ import android.graphics.BitmapFactory;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -313,7 +314,7 @@ public class MainMenuRegistFragment extends Fragment {
                 .build();
 
         Request request = new Request.Builder()
-                .url("http://192.168.9.162:5000/predict")
+                .url("http://10.75.1.31:5000/predict")
                 .post(requestBody)
                 .build();
 
@@ -335,20 +336,68 @@ public class MainMenuRegistFragment extends Fragment {
         handler.post(new Runnable() {
             @Override
             public void run() {
-                String prediction;
                 try {
                     JSONObject jsonObject = new JSONObject(responseBody);
                     if (jsonObject.has("prediction")) {
-                        prediction = jsonObject.getString("prediction");
+                        JSONArray predictionArray = jsonObject.getJSONArray("prediction");
+
+                        if (predictionArray.length() > 0) {
+                            double maxPrediction = Double.MIN_VALUE; // 최소값으로 초기화
+                            int maxPredictionIndex = -1; // 초기 인덱스 설정
+
+                            for (int i = 0; i < predictionArray.length(); i++) {
+                                JSONArray nestedArray = predictionArray.getJSONArray(i);
+
+                                for (int j = 0; j < nestedArray.length(); j++) {
+                                    double predictionItem = nestedArray.getDouble(j);
+                                    if (predictionItem > maxPrediction) {
+                                        maxPrediction = predictionItem;
+                                        maxPredictionIndex = i;
+                                    }
+                                }
+                            }
+
+                            Log.d("JSON", jsonObject.toString(4)); // 들여쓰기를 4칸으로 설정해서 예쁘게 출력
+                            String category = getCategoryFromIndex(maxPredictionIndex);
+                            itemTypeEditText.setText("Category: " + category);
+                        } else {
+                            // JSON 배열이 비어있을 때 처리
+                            itemTypeEditText.setText("No prediction found.");
+                        }
                     } else {
-                        prediction = "값 없음";
+                        // "prediction" 키가 없을 경우 처리
                     }
-                    Log.d("JSON", jsonObject.toString(4)); // 들여쓰기를 4칸으로 설정해서 예쁘게 출력
-                    itemTypeEditText.setText("Category: " + prediction);
-                } catch (JSONException e) {
+                } catch (JSONException | NumberFormatException e) {
                     e.printStackTrace();
                 }
             }
+
+
+            private String getCategoryFromIndex(int index) {
+                switch (index) {
+                    case 0:
+                        return "태블릿";
+                    case 1:
+                        return "스마트워치";
+
+                    case 2:
+                        return "무선이어폰";
+                    case 3:
+                        return "신분증";
+                    case 4:
+                        return "가방";
+                    case 5:
+                        return "지갑";
+                    case 6:
+                        return "카드";
+                    case 7:
+                        return "휴대폰";
+                    default:
+                        return "알 수 없음";
+                }
+            }
+
+
         });
     }
 
