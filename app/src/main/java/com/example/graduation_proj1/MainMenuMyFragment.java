@@ -76,6 +76,7 @@ public class MainMenuMyFragment extends Fragment {
         FirebaseAuth auth = FirebaseAuth.getInstance();
         FirebaseUser user = auth.getCurrentUser();
 
+
         if (user != null) {
             String userId = user.getUid();
 
