@@ -103,6 +103,7 @@ public class MainMenuMyFragment extends Fragment {
         FirebaseAuth auth = FirebaseAuth.getInstance();
 
 
+
         if (user != null) {
             String userId = user.getUid();
 
