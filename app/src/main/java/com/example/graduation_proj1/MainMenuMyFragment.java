@@ -1,8 +1,7 @@
 package com.example.graduation_proj1;
 
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+
+import android.content.Context;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,6 +11,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 
 import com.example.graduation_proj1.models.RecyclerViewItem;
 import com.google.firebase.auth.FirebaseAuth;
@@ -36,8 +43,11 @@ public class MainMenuMyFragment extends Fragment {
     private UserActivityAdapter adapter;
 
 
-    public static MainMenuMyFragment newInstance() {
-        return new MainMenuMyFragment();
+    private List<RecyclerViewItem> itemList = new ArrayList<>();
+    private LostItemAdapter adapter;
+
+    public static MainMenuMyFragment newInstance(){
+
     }
 
     @Override
@@ -64,21 +74,34 @@ public class MainMenuMyFragment extends Fragment {
             }
         });
 
-        // 로그아웃 버튼 클릭 시 로그아웃 처리 및 메인 화면으로 이동
-        Button logoutButton = rootView.findViewById(R.id.logoutButton);
-        logoutButton.setOnClickListener(new View.OnClickListener() {
+
+        RecyclerView recyclerView = rootView.findViewById(R.id.recyclerView2);
+
+        //item list 출력
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        adapter = new LostItemAdapter(getActivity(), itemList, new LostItemAdapter.OnItemClickListener() {
             @Override
-            public void onClick(View v) {
-                FirebaseAuth.getInstance().signOut();
-                navigateToMainActivity();
+            public void onItemClick(RecyclerViewItem item) {
+                // 아이템을 클릭했을 때 호출되는 메서드
+                // 상세 페이지로 이동
+                ItemDetailFragment fragment = ItemDetailFragment.newInstance(item);
+
+                // Fragment를 트랜잭션을 사용하여 교체
+                FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+                transaction.replace(R.id.fragment_container, fragment);
+                transaction.addToBackStack(null); // 백 스택에 추가하여 뒤로 가기 버튼을 사용할 수 있도록 함
+                transaction.commit();
             }
         });
 
-        return rootView;
-    }
+        recyclerView.setAdapter(adapter);
 
-    private void fetchUserActivity() {
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        fetchLostItems(rootView); // Firebase에서 데이터 가져오기
+
+
+        // 사용자 이름 불러와 TextView에 표시
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+
 
         if (user != null) {
             String userId = user.getUid();
@@ -171,6 +194,52 @@ public class MainMenuMyFragment extends Fragment {
     }
 
 
+
+    private void fetchLostItems(ViewGroup rootView ) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        Context context = getActivity();
+
+        //유저에 해당하는 정보만 가져오기
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        db.collection("users")
+                .document(userId)
+                .collection("items")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    itemList.clear();
+                    for (DocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                        String title = documentSnapshot.getString("title");
+                        String itemType = documentSnapshot.getString("itemType");
+                        String imageUrl = documentSnapshot.getString("imageUrl");
+
+                        Log.d("MyTag", "Title: " + title + ", ItemType: " + itemType + ", ImageUrl: " + imageUrl);
+
+                        // title과 itemType을 사용하거나 저장
+                        RecyclerViewItem recyclerViewItem = new RecyclerViewItem();
+                        recyclerViewItem.setTitle(title);
+                        recyclerViewItem.setItemType(itemType);
+                        recyclerViewItem.setImageUrl(imageUrl);
+                        itemList.add(recyclerViewItem);
+                    }
+                    adapter.notifyDataSetChanged(); // 데이터 변경 알림
+
+                    // 아이템 목록이 비어있는지 확인하고 TextView를 처리
+                    if (itemList.isEmpty()) {
+                        // 아이템 목록이 비어있을 때
+                        TextView noItemsTextView = rootView.findViewById(R.id.textView25);
+                        noItemsTextView.setVisibility(View.VISIBLE); // TextView를 표시
+                    } else {
+                        // 아이템 목록이 비어있지 않을 때
+                        TextView noItemsTextView = rootView.findViewById(R.id.textView25);
+                        noItemsTextView.setVisibility(View.GONE); // TextView를 숨김
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    // 데이터 가져오기 실패 처리
+                });
+    }
 
     private void navigateToMainActivity() {
         getActivity().finish(); // 현재 액티비티를 종료합니다.
