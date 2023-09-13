@@ -315,6 +315,7 @@ public class MainMenuRegistFragment extends Fragment {
 
         Request request = new Request.Builder()
                 .url("http://10.75.1.31:5000/predict")
+
                 .post(requestBody)
                 .build();
 

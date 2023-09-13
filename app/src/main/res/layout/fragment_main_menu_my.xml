@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".MainMenuMyFragment">
 
+
     <Button
         android:id="@+id/editProfile_btn"
         android:layout_width="wrap_content"
@@ -70,20 +71,31 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline2" />
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/activitiesRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
     <TextView
-        android:id="@+id/textView25"
-        android:layout_width="148dp"
-        android:layout_height="25dp"
-        android:layout_marginBottom="320dp"
-        android:layout_weight="1"
+        android:id="@+id/activityNameTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:ignore="MissingConstraints" />
+    <!-- 기타 속성 -->
+    />
+
+
+    <!-- 활동 내역이 없을 때 표시할 메시지 -->
+    <!-- 기본적으로 숨겨둠 -->
+
+    <TextView
+        android:id="@+id/noActivityTextView"
+        android:layout_width="194dp"
+        android:layout_height="268dp"
+        android:layout_centerInParent="true"
         android:text="활동 내역이 없습니다."
-        android:textSize="16sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/userNameTextView"
-        app:layout_constraintVertical_bias="1.0" />
+        tools:layout_editor_absoluteX="138dp"
+        tools:layout_editor_absoluteY="372dp" />
 
     <View
         android:id="@+id/view2"
@@ -95,7 +107,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         tools:layout_editor_absoluteY="91dp"
-        tools:ignore="MissingConstraints" />
+        tools:ignore="MissingConstraints"/>
 
     <ImageView
         android:id="@+id/imageView2"
