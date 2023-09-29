@@ -253,10 +253,22 @@ public class MainMenuRegistFragment extends Fragment {
     }
     // Bitmap을 Uri로 변환하는 메서드
     private Uri getImageUri(Context context, Bitmap bitmap) {
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-        String path = MediaStore.Images.Media.insertImage(context.getContentResolver(), bitmap, "Title", null);
-        return Uri.parse(path);
+        try{
+            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+            String path = MediaStore.Images.Media.insertImage(context.getContentResolver(), bitmap, "Title", null);
+
+            if (path != null) {
+                selectedImageUri = Uri.parse(path);
+            } else {
+                // 이미지 URI를 가져오는 데 실패한 경우에 대한 처리
+                // 이 부분을 필요에 따라 로그 출력 등으로 수정할 수 있습니다.
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+            //예외처리
+        }
+        return selectedImageUri;
     }
 
     //" 이미지를 제외한 나머지 정보 입력하기 구현(심화)"
@@ -314,7 +326,7 @@ public class MainMenuRegistFragment extends Fragment {
                 .build();
 
         Request request = new Request.Builder()
-                .url("http://10.75.1.31:5000/predict")
+                .url("http://10.75.1.91:5000/predict")
                 .post(requestBody)
                 .build();
 
@@ -379,7 +391,6 @@ public class MainMenuRegistFragment extends Fragment {
                         return "태블릿";
                     case 1:
                         return "스마트워치";
-
                     case 2:
                         return "무선이어폰";
                     case 3:
