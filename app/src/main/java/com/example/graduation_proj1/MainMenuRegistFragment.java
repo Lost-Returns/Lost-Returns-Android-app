@@ -327,6 +327,7 @@ public class MainMenuRegistFragment extends Fragment {
 
         Request request = new Request.Builder()
                 .url("http://10.75.1.91:5000/predict")
+
                 .post(requestBody)
                 .build();
 
@@ -364,10 +365,16 @@ public class MainMenuRegistFragment extends Fragment {
                                     double predictionItem = nestedArray.getDouble(j);
                                     if (predictionItem > maxPrediction) {
                                         maxPrediction = predictionItem;
-                                        maxPredictionIndex = i;
+                                        Log.d("Max Prediction", "Max Prediction Value: " + maxPrediction);
+
+                                        maxPredictionIndex = j;
+                                        Log.d("Max Prediction", "Max Prediction Index: " + maxPredictionIndex);
                                     }
                                 }
                             }
+                            // 최대 값과 인덱스 확인
+
+
 
                             Log.d("JSON", jsonObject.toString(4)); // 들여쓰기를 4칸으로 설정해서 예쁘게 출력
                             String category = getCategoryFromIndex(maxPredictionIndex);
