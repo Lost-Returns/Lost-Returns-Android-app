@@ -389,7 +389,7 @@ public class MainMenuRegistFragment extends Fragment {
                 .build();
 
         Request request = new Request.Builder()
-                .url("http://your-second-model-server-url") // 두 번째 모델 서버의 URL로 변경
+                .url("http://172.16.230.76:5000//predict_objects_category") // 두 번째 모델 서버의 URL로 변경
 
                 .post(requestBody)
                 .build();
