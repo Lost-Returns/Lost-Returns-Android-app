@@ -308,6 +308,43 @@ public class MainMenuRegistFragment extends Fragment {
 
 
     // 모델 서버에 이미지를 전송하고 예측값을 받아오는 함수
+    /*private void sendImageToModelServer() {
+        // 이미지뷰에서 이미지 추출
+        imageView.setDrawingCacheEnabled(true);
+        imageView.buildDrawingCache();
+        Bitmap imageBitmap = imageView.getDrawingCache();
+
+        // 비트맵을 바이트 배열로 변환
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+        byte[] imageBytes = outputStream.toByteArray();
+
+        // HTTP POST 요청 보내기
+        RequestBody requestBody = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("image", "image.jpg", RequestBody.create(MediaType.parse("image/jpeg"), imageBytes))
+                .build();
+
+        Request request = new Request.Builder()
+                .url("http://172.16.230.76:5000/predict_objects_category")
+                .post(requestBody)
+                .build();
+
+        client.newCall(request).enqueue(new okhttp3.Callback() {
+            @Override
+            public void onFailure(okhttp3.Call call, IOException e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onResponse(okhttp3.Call call, Response response) throws IOException {
+                String responseBody = response.body().string();
+                processResponse(responseBody);
+
+            }
+        });
+    }*/
+
     private void sendImageToModelServer() {
         // 이미지뷰에서 이미지 추출
         imageView.setDrawingCacheEnabled(true);
@@ -326,7 +363,33 @@ public class MainMenuRegistFragment extends Fragment {
                 .build();
 
         Request request = new Request.Builder()
-                .url("http://10.75.1.91:5000/predict")
+                .url("http://172.16.230.76:5000/predict_single_object") // 첫 번째 모델 서버
+                .post(requestBody)
+                .build();
+
+        client.newCall(request).enqueue(new okhttp3.Callback() {
+            @Override
+            public void onFailure(okhttp3.Call call, IOException e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onResponse(okhttp3.Call call, Response response) throws IOException {
+                String responseBody = response.body().string();
+                processResponsePure(responseBody, imageBytes);
+            }
+        });
+    }
+
+    // 두 번째 모델 서버 호출
+    private void callSecondModelServer(byte[] imageBytes) {
+        RequestBody requestBody = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("image", "image.jpg", RequestBody.create(MediaType.parse("image/jpeg"), imageBytes))
+                .build();
+
+        Request request = new Request.Builder()
+                .url("http://your-second-model-server-url") // 두 번째 모델 서버의 URL로 변경
 
                 .post(requestBody)
                 .build();
@@ -341,12 +404,87 @@ public class MainMenuRegistFragment extends Fragment {
             public void onResponse(okhttp3.Call call, Response response) throws IOException {
                 String responseBody = response.body().string();
                 processResponse(responseBody);
-
             }
         });
     }
+
+    // 에러 메시지 표시
+    private void showErrorMessage(final String message) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                itemTypeEditText.setText(message);
+            }
+        });
+    }
+
+    private void processResponsePure(String responseBody, byte[] imageBytes){
+        handler.post(new Runnable() {
+            public void run() {
+                try {
+                    JSONObject jsonObject = new JSONObject(responseBody);
+                    if (jsonObject.has("prediction")) {
+                        JSONArray predictionArray = jsonObject.getJSONArray("prediction");
+                        Log.d("Pure Prediction", "Pure Prediction Value: " + predictionArray);
+
+                        if (predictionArray.length() > 0) {
+                            double maxPrediction = Double.MIN_VALUE; // 최소값으로 초기화
+                            int maxPredictionIndex = -1; // 초기 인덱스 설정
+
+                            for (int i = 0; i < predictionArray.length(); i++) {
+                                JSONArray nestedArray = predictionArray.getJSONArray(i);
+
+                                for (int j = 0; j < nestedArray.length(); j++) {
+                                    double predictionItem = nestedArray.getDouble(j);
+                                    if (predictionItem > maxPrediction) {
+                                        maxPrediction = predictionItem;
+                                        Log.d("Max Prediction", "Max Prediction Value: " + maxPrediction);
+
+                                        maxPredictionIndex = j;
+                                        Log.d("Max Prediction", "Max Prediction Index: " + maxPredictionIndex);
+                                    }
+                                }
+                            }
+                            // 최대 값과 인덱스 확인
+                            Log.d("JSON", jsonObject.toString(4)); // 들여쓰기를 4칸으로 설정해서 예쁘게 출력
+                            String isSingle = getPureFromIndex(maxPredictionIndex);
+                            Log.d("number predict","개수 판별:" +isSingle);
+                            if (isSingle.equals("single")){
+                                callSecondModelServer(imageBytes);
+                            }
+                            else{
+                                // 다중 오브젝트로 판별될 때 처리
+                                showErrorMessage("사진에 포함된 객체의 개수가 2개 이상이라 판단이 불가능합니다. 단일 객체 이미지로 다시 시도하십시오.");
+                            }
+                        } else {
+                            // JSON 배열이 비어있을 때 처리
+                            itemTypeEditText.setText("No prediction found.");
+                        }
+                    } else {
+                        // "prediction" 키가 없을 경우 처리
+                    }
+                } catch (JSONException | NumberFormatException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            private String getPureFromIndex(int index) {
+                switch (index) {
+                    case 0:
+                        return "single";
+                    case 1:
+                        return "multi";
+                    default:
+                        return "알 수 없음";
+                }
+            }
+
+        });
+    }
+
     private void processResponse(String responseBody){
         handler.post(new Runnable() {
+
             @Override
             public void run() {
                 try {
@@ -373,9 +511,6 @@ public class MainMenuRegistFragment extends Fragment {
                                 }
                             }
                             // 최대 값과 인덱스 확인
-
-
-
                             Log.d("JSON", jsonObject.toString(4)); // 들여쓰기를 4칸으로 설정해서 예쁘게 출력
                             String category = getCategoryFromIndex(maxPredictionIndex);
                             itemTypeEditText.setText("Category: " + category);
@@ -390,7 +525,6 @@ public class MainMenuRegistFragment extends Fragment {
                     e.printStackTrace();
                 }
             }
-
 
             private String getCategoryFromIndex(int index) {
                 switch (index) {
