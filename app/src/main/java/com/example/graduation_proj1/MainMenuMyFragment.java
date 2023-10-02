@@ -150,6 +150,12 @@ public class MainMenuMyFragment extends Fragment {
                         String title = documentSnapshot.getString("title");
                         String itemType = documentSnapshot.getString("itemType");
                         String imageUrl = documentSnapshot.getString("imageUrl");
+                        //추가정보
+                        String owner = documentSnapshot.getString("owner");
+                        String location = documentSnapshot.getString("location");
+                        String contact = documentSnapshot.getString("contact");
+                        String foundDate = documentSnapshot.getString("foundDate");
+                        String foundLocation = documentSnapshot.getString("foundLocation");
 
                         Log.d("MyTag", "Title: " + title + ", ItemType: " + itemType + ", ImageUrl: " + imageUrl);
 
@@ -158,6 +164,12 @@ public class MainMenuMyFragment extends Fragment {
                         recyclerViewItem.setTitle(title);
                         recyclerViewItem.setItemType(itemType);
                         recyclerViewItem.setImageUrl(imageUrl);
+
+                        recyclerViewItem.setOwner(owner);
+                        recyclerViewItem.setLocation(location);
+                        recyclerViewItem.setContact(contact);
+                        recyclerViewItem.setFoundDate(foundDate);
+                        recyclerViewItem.setFoundLocation(foundLocation);
                         itemList.add(recyclerViewItem);
                     }
                     adapter.notifyDataSetChanged(); // 데이터 변경 알림
