@@ -76,7 +76,7 @@ public class MainMenuRegistFragment extends Fragment {
     private static final int REQUEST_GALLERY = 2;
     private Uri selectedImageUri = null; // 이미지 URI를 저장할 변수
     private String prediction = "기타"; // 예측값 저장할 변수
-    private final OkHttpClient client = new OkHttpClient.Builder()
+    private final OkHttpClient client  = new OkHttpClient.Builder()
             .protocols(Arrays.asList(Protocol.HTTP_1_1, Protocol.HTTP_2))
             .build();
     private Handler handler;
@@ -308,43 +308,6 @@ public class MainMenuRegistFragment extends Fragment {
 
 
     // 모델 서버에 이미지를 전송하고 예측값을 받아오는 함수
-    /*private void sendImageToModelServer() {
-        // 이미지뷰에서 이미지 추출
-        imageView.setDrawingCacheEnabled(true);
-        imageView.buildDrawingCache();
-        Bitmap imageBitmap = imageView.getDrawingCache();
-
-        // 비트맵을 바이트 배열로 변환
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
-        byte[] imageBytes = outputStream.toByteArray();
-
-        // HTTP POST 요청 보내기
-        RequestBody requestBody = new MultipartBody.Builder()
-                .setType(MultipartBody.FORM)
-                .addFormDataPart("image", "image.jpg", RequestBody.create(MediaType.parse("image/jpeg"), imageBytes))
-                .build();
-
-        Request request = new Request.Builder()
-                .url("http://172.16.230.76:5000/predict_objects_category")
-                .post(requestBody)
-                .build();
-
-        client.newCall(request).enqueue(new okhttp3.Callback() {
-            @Override
-            public void onFailure(okhttp3.Call call, IOException e) {
-                e.printStackTrace();
-            }
-
-            @Override
-            public void onResponse(okhttp3.Call call, Response response) throws IOException {
-                String responseBody = response.body().string();
-                processResponse(responseBody);
-
-            }
-        });
-    }*/
-
     private void sendImageToModelServer() {
         // 이미지뷰에서 이미지 추출
         imageView.setDrawingCacheEnabled(true);
