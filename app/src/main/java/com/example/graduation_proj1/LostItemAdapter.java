@@ -82,7 +82,10 @@ public class LostItemAdapter extends RecyclerView.Adapter<LostItemAdapter.ViewHo
         return mItemList.size();
     }
 
-
+    public void setItems(List<RecyclerViewItem> items) {
+        mItemList = items;
+        notifyDataSetChanged();
+    }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         // ViewHolder 내부의 UI 요소 선언 및 초기화
