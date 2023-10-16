@@ -485,10 +485,10 @@ public class MainMenuRegistFragment extends Fragment {
                             else if (category.equals("지갑") || category.equals("가방")) {
                                 main_category = "잡화";
                             }
-                            else if (category.equals("신분증")) {
+                            else if (category.equals("주민등록증")) {
                                 main_category = "신분증";
                             }
-                            else if (category.equals("카드")) {
+                            else if (category.equals("신용카드")) {
                                 main_category = "카드";
                             }
                             // 그 외의 경우
@@ -519,13 +519,13 @@ public class MainMenuRegistFragment extends Fragment {
                     case 2:
                         return "무선이어폰";
                     case 3:
-                        return "신분증";
+                        return "주민등록증";
                     case 4:
                         return "가방";
                     case 5:
                         return "지갑";
                     case 6:
-                        return "카드";
+                        return "신용카드";
                     case 7:
                         return "휴대폰";
                     default:
