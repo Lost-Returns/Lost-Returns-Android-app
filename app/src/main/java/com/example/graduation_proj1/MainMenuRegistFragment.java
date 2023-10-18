@@ -476,7 +476,7 @@ public class MainMenuRegistFragment extends Fragment {
                             // 최대 값과 인덱스 확인
                             Log.d("JSON", jsonObject.toString(4)); // 들여쓰기를 4칸으로 설정해서 예쁘게 출력
                             String category = getCategoryFromIndex(maxPredictionIndex);
-                            itemTypeEditText.setText("Category: " + category);
+                            itemTypeEditText.setText(category);
                         } else {
                             // JSON 배열이 비어있을 때 처리
                             itemTypeEditText.setText("No prediction found.");
