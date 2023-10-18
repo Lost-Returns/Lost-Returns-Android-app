@@ -477,6 +477,7 @@ public class MainMenuRegistFragment extends Fragment {
                             // 최대 값과 인덱스 확인
                             Log.d("JSON", jsonObject.toString(4)); // 들여쓰기를 4칸으로 설정해서 예쁘게 출력
                             String category = getCategoryFromIndex(maxPredictionIndex);
+
                             // category가 휴대폰이나 무선이어폰인 경우
                             if (category.equals("휴대폰") || category.equals("무선이어폰") || category.equals("스마트워치") || category.equals("태블릿")) {
                                 main_category = "전자기기";
