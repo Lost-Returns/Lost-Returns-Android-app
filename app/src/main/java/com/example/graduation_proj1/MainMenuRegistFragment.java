@@ -66,7 +66,7 @@ import okhttp3.Response;
 
 
 public class MainMenuRegistFragment extends Fragment {
-
+    private String main_category;
     private Button btn_picture;
     private ImageView imageView;
     private EditText titleEditText, itemTypeEditText, ownerEditText, locationEditText, contactEditText, foundDateEditText, foundLocationEditText;
@@ -128,6 +128,7 @@ public class MainMenuRegistFragment extends Fragment {
                 saveDataToFirestoreWithImage(imageUri,title, itemType, owner, loc, contact, foundDate, foundLoc);
             }
         });
+        main_category = ""; // 초기화
 
         return rootView;
     }
@@ -326,7 +327,7 @@ public class MainMenuRegistFragment extends Fragment {
                 .build();
 
         Request request = new Request.Builder()
-                .url("http://172.16.230.76:5000/predict_single_object") // 첫 번째 모델 서버
+                .url("http://192.168.45.86:5000/predict_single_object") // 첫 번째 모델 서버
                 .post(requestBody)
                 .build();
 
@@ -352,7 +353,7 @@ public class MainMenuRegistFragment extends Fragment {
                 .build();
 
         Request request = new Request.Builder()
-                .url("http://172.16.230.76:5000//predict_objects_category") // 두 번째 모델 서버의 URL로 변경
+                .url("http://192.168.45.86:5000//predict_objects_category") // 두 번째 모델 서버의 URL로 변경
 
                 .post(requestBody)
                 .build();
@@ -476,7 +477,28 @@ public class MainMenuRegistFragment extends Fragment {
                             // 최대 값과 인덱스 확인
                             Log.d("JSON", jsonObject.toString(4)); // 들여쓰기를 4칸으로 설정해서 예쁘게 출력
                             String category = getCategoryFromIndex(maxPredictionIndex);
-                            itemTypeEditText.setText(category);
+
+                            // category가 휴대폰이나 무선이어폰인 경우
+                            if (category.equals("휴대폰") || category.equals("무선이어폰") || category.equals("스마트워치") || category.equals("태블릿")) {
+                                main_category = "전자기기";
+                            }
+                            // category가 지갑인 경우
+                            else if (category.equals("지갑") || category.equals("가방")) {
+                                main_category = "잡화";
+                            }
+                            else if (category.equals("주민등록증")) {
+                                main_category = "신분증";
+                            }
+                            else if (category.equals("신용카드")) {
+                                main_category = "카드";
+                            }
+                            // 그 외의 경우
+                            else {
+                                main_category = "기타";
+                            }
+
+                            // itemTypeEditText에 값을 설정
+                            itemTypeEditText.setText(main_category + "/" + category);
                         } else {
                             // JSON 배열이 비어있을 때 처리
                             itemTypeEditText.setText("No prediction found.");
@@ -498,13 +520,13 @@ public class MainMenuRegistFragment extends Fragment {
                     case 2:
                         return "무선이어폰";
                     case 3:
-                        return "신분증";
+                        return "주민등록증";
                     case 4:
                         return "가방";
                     case 5:
                         return "지갑";
                     case 6:
-                        return "카드";
+                        return "신용카드";
                     case 7:
                         return "휴대폰";
                     default:
