@@ -42,13 +42,18 @@ public class MainMenuHomeFragment extends Fragment {
         //spinner 추가
         List<String> categoryList = new ArrayList<>();
         categoryList.add("전체");
+        categoryList.add("전자기기");
+        categoryList.add("잡화");
+        categoryList.add("카드");
+        categoryList.add("신분증");
+
         categoryList.add("태블릿");
         categoryList.add("스마트워치");
         categoryList.add("무선이어폰");
-        categoryList.add("신분증");
+        categoryList.add("주민등록증");
         categoryList.add("가방");
         categoryList.add("지갑");
-        categoryList.add("카드");
+        categoryList.add("신용카드");
         categoryList.add("휴대폰");
 
         ArrayAdapter<String> categoryAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, categoryList);
@@ -111,7 +116,7 @@ public class MainMenuHomeFragment extends Fragment {
         List<RecyclerViewItem> filteredItems = new ArrayList<>();
 
         for (RecyclerViewItem item : itemList) {
-            if (item.getItemType().equals(category)) { // 예를 들어, 카테고리 필터링을 아이템의 itemType과 연결하는 경우
+            if (item.getItemType().contains(category)) { // 예를 들어, 카테고리 필터링을 아이템의 itemType과 연결하는 경우
                 filteredItems.add(item);
             }
         }

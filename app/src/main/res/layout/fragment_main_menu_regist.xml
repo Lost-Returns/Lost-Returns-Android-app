@@ -46,7 +46,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="36dp"
                 android:layout_marginTop="44dp"
-                android:text="제목"
+                android:text="*제목"
                 android:textColor="#03A9F4"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/btn_picture" />
@@ -57,7 +57,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="36dp"
                 android:layout_marginTop="42dp"
-                android:text="물건 종류(대분류/소분류)"
+                android:text="*분류(대분류/소분류)"
                 android:textColor="#03A9F4"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView17" />
@@ -68,7 +68,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="36dp"
                 android:layout_marginTop="42dp"
-                android:text="분실자명 (선택)"
+                android:text="분실자명"
 
                 android:textColor="#03A9F4"
                 app:layout_constraintStart_toStartOf="parent"
@@ -80,7 +80,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="36dp"
                 android:layout_marginTop="42dp"
-                android:text="보관 장소"
+                android:text="*보관 장소"
                 android:textColor="#03A9F4"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView19" />
@@ -91,7 +91,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="36dp"
                 android:layout_marginTop="42dp"
-                android:text="연락처"
+                android:text="*연락처"
                 android:textColor="#03A9F4"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView20" />

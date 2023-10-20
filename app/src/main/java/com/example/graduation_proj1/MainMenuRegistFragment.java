@@ -43,8 +43,10 @@ import com.google.firebase.storage.UploadTask;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import android.graphics.Bitmap;
@@ -74,7 +76,12 @@ public class MainMenuRegistFragment extends Fragment {
 
     private static final int REQUEST_CAMERA = 1;
     private static final int REQUEST_GALLERY = 2;
+
+    private List<Uri> selectedImageUris = new ArrayList<>(); // 여러 이미지 Uri를 저장할 리스트
     private Uri selectedImageUri = null; // 이미지 URI를 저장할 변수
+
+    private int temp = 0;
+    private int itemCount = 0;
     private String prediction = "기타"; // 예측값 저장할 변수
     private final OkHttpClient client  = new OkHttpClient.Builder()
             .protocols(Arrays.asList(Protocol.HTTP_1_1, Protocol.HTTP_2))
@@ -115,7 +122,7 @@ public class MainMenuRegistFragment extends Fragment {
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Uri imageUri = selectedImageUri;
+                Uri imageUri = selectedImageUris.get(temp);
                 String title = titleEditText.getText().toString();
                 String itemType = itemTypeEditText.getText().toString();
                 String owner = ownerEditText.getText().toString();
@@ -158,7 +165,12 @@ public class MainMenuRegistFragment extends Fragment {
     }
 
     private void choosePhotoFromGallery() {
-        Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        /*Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(galleryIntent, REQUEST_GALLERY);*/
+
+        Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
+        galleryIntent.setType("image/*");
+        galleryIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true); // 다중 이미지 선택을 가능하게 함
         startActivityForResult(galleryIntent, REQUEST_GALLERY);
     }
 
@@ -222,18 +234,35 @@ public class MainMenuRegistFragment extends Fragment {
         if (requestCode == REQUEST_GALLERY) {
             if (data != null) {
                 // 갤러리에서 선택한 이미지의 Uri 가져오기
-                selectedImageUri = data.getData();
+                //selectedImageUri = data.getData();
+                //selectedImageUris.add(selectedImageUri); // Uri를 리스트에 추가
+                if (data.getClipData() != null) {
+                    itemCount = data.getClipData().getItemCount();
+                    for (int i = 0; i < itemCount; i++) {
+                        Uri imageUri = data.getClipData().getItemAt(i).getUri();
+                        selectedImageUris.add(imageUri);
+                    }
+                } else if (data.getData() != null) {
+                    // Only one image was selected
+                    Uri imageUri = data.getData();
+                    selectedImageUris.add(imageUri);
+                }
+                Log.d("s", "+"+selectedImageUri+" "+selectedImageUris);
+
+                //첫번째 사진 처리
                 try {
                     // Uri를 이용하여 비트맵으로 변환
-                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), selectedImageUri);
+                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), selectedImageUris.get(temp));
                     //이미지뷰에 비트맵 설정하여 표시
                     imageView.setImageBitmap(bitmap);
+
 
                     // 모델 서버에 이미지 전송 & 예측값 받아오기 & 예측값을 TextView(itemTypeEditText)에 업데이트
                     sendImageToModelServer();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+
             }
         } else if (requestCode == REQUEST_CAMERA) {
             if (data != null) {
@@ -583,8 +612,42 @@ public class MainMenuRegistFragment extends Fragment {
                                             public void onSuccess(DocumentReference documentReference) {
                                                 // 데이터 저장 성공 시 처리
                                                 Toast.makeText(getActivity(), "데이터 저장 성공!", Toast.LENGTH_SHORT).show();
+
+                                                //화면 새로고침
+                                                titleEditText.setText("");
+                                                itemTypeEditText.setText("");
+                                                ownerEditText.setText("");
+                                                locationEditText.setText("");
+                                                contactEditText.setText("");
+                                                foundDateEditText.setText("");
+                                                foundLocationEditText.setText("");
+
+
+                                                //새로운 예측값 가져오기
+                                                temp++;
+                                                if(temp < itemCount){
+                                                    Log.d("temp / itemCount", temp+"/"+itemCount);
+                                                    try {
+                                                        // Uri를 이용하여 비트맵으로 변환
+                                                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), selectedImageUris.get(temp));
+                                                        //이미지뷰에 비트맵 설정하여 표시
+                                                        imageView.setImageBitmap(bitmap);
+
+                                                        // 모델 서버에 이미지 전송 & 예측값 받아오기 & 예측값을 TextView(itemTypeEditText)에 업데이트
+                                                        sendImageToModelServer();
+                                                    } catch (IOException e) {
+                                                        e.printStackTrace();
+                                                    }
+
+                                                }
+
+
                                                 // Fragment 전환
-                                                ((MainMenuActivity)getActivity()).replaceFragment(MainMenuHomeFragment.newInstance());
+                                                else if(itemCount == temp) {
+                                                    Log.d("temp / itemCount", temp+"/"+itemCount);
+                                                    temp = 0;
+                                                    ((MainMenuActivity) getActivity()).replaceFragment(MainMenuHomeFragment.newInstance());
+                                                }
                                             }
                                         })
                                         .addOnFailureListener(new OnFailureListener() {
